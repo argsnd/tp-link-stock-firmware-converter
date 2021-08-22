@@ -3,7 +3,7 @@ The live branch contains a pre-compiled version of this tool. If you wish to com
 
 1. Install Emscripten.
 2. Download [tplink-safeloader.c](https://github.com/openwrt/openwrt/blob/master/tools/firmware-utils/src/tplink-safeloader.c), [md5.c](https://github.com/openwrt/openwrt/blob/master/tools/firmware-utils/src/md5.c), and [md5.h](https://github.com/openwrt/openwrt/blob/master/tools/firmware-utils/src/md5.h) from the OpenWrt repository to this directory.
-3. Compile tplink-safeloader with emscripten: 
+3. Compile tplink-safeloader: 
 ```bash
 emcc tplink-safeloader.c md5.c -o safeloader.js -s FORCE_FILESYSTEM=1 -s EXIT_RUNTIME=1 -s EXTRA_EXPORTED_RUNTIME_METHODS=FS
 ```
