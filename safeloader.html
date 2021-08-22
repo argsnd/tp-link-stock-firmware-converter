@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>TP-Link Stock Firmware Converter</title>
+    <style>
+      body {
+        font-family: arial;
+      }
+    </style>
+  </head>
+  <body>
+    <p>Use this tool to convert a TP-Link stock firmware to an OpenWrt-compatible sysupgrade file.</p>
+    <p>This is useful in case you want to return to a stock firmware from OpenWrt.</p>
+    <p>This tool is based on the <a href="https://github.com/openwrt/openwrt/blob/master/tools/firmware-utils/src/tplink-safeloader.c">TP-Link Safeloader</a>. You may look through the source code to find a list of compatible devices.</p>
+    <label for="file-input">Upload a file:</label>
+    <input id="file-input" type="file">
+    <script type="text/javascript">
+      var fileInput = document.getElementById('file-input');
+      fileInput.onchange = function(event) {
+        var reader = new FileReader();
+        var files = event.target.files;
+        reader.onloadend = function() {
+          var fileName = "file";
+          var base64result = reader.result.split(',')[1];
+          run_safeloader(fileName, base64result);
+        };
+        reader.readAsDataURL(files[0]);
+      };
+
+      function run_safeloader(fileName, fileData) {
+        var Module = {
+          print: function(text) { console.log('stdout: ' + text) },
+          printErr: function(text) { console.error('stderr: ' + text) },
+          preRun: function() {
+            FS.createDataFile(".", fileName, atob(fileData), true, true);
+          },
+          postRun: function () {
+            let mime = "application/octet-stream";
+            let filename = "sysupgrade.bin"
+
+            let content = Module.FS.readFile(filename);
+            console.log(`Offering download of "${filename}", with ${content.length} bytes...`);
+
+            var a = document.createElement('a');
+            a.download = filename;
+            a.href = URL.createObjectURL(new Blob([content], {type: mime}));
+            a.style.display = 'none';
+
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+              document.body.removeChild(a);
+              URL.revokeObjectURL(a.href);
+            }, 2000);
+          },
+          totalDependencies: 0,
+          arguments: ["-z", fileName, "-o", "sysupgrade.bin"]
+        };
+        var safeloader = document.getElementById('safeloader-runner');
+        if (safeloader) {
+          safeloader.remove();
+        }
+        safeloader = document.createElement('script');
+        safeloader.setAttribute('src', 'safeloader.js');
+        safeloader.setAttribute('id', 'safeloader-runner');
+        document.head.appendChild(safeloader);
+      }
+    </script>
+  </body>
+</html>
