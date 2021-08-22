@@ -30,8 +30,10 @@
         reader.readAsDataURL(files[0]);
       };
 
+      var Module;
+
       function run_safeloader(fileName, fileData) {
-        var Module = {
+        Module = {
           print: function(text) { console.log('stdout: ' + text) },
           printErr: function(text) { console.error('stderr: ' + text) },
           preRun: function() {
